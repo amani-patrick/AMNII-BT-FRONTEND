@@ -1,6 +1,26 @@
-import PropTypes from "prop-types";
+import PropTypes, { string, arrayOf, shape } from "prop-types";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-const ActivityMonitor = ({ trades }) => {
+const ActivityMonitor = () => {
+  const [trades, setTrades] = useState([]);
+
+  useEffect(() => {
+    const fetchTrades = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        const response = await axios.get("http://localhost:8000/api/orders/", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setTrades(response.data);
+      } catch (error) {
+        console.error("Error fetching trades:", error);
+      }
+    };
+
+    fetchTrades();
+  }, []);
+
   return (
     <div className="p-6 bg-white">
       <div className="flex justify-between items-center mb-2">
@@ -10,57 +30,60 @@ const ActivityMonitor = ({ trades }) => {
         </a>
       </div>
 
-      <div className="bg-purple-600 text-white rounded-xl p-4 shadow-lg">
-        <table className="w-full">
-          <thead>
-            <tr className="text-left text-sm uppercase">
-              <th className="pb-3">Transactions</th>
-              <th className="pb-3">Amount</th>
-              <th className="pb-3">Price</th>
-              <th className="pb-3">Status</th>
-              <th className="pb-3">Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {trades.map((trade, index) => (
-              <tr key={index} className="border-t border-white/20 text-sm">
-                <td className="py-3 flex items-center space-x-2">
-                  {/* Dynamically load the image based on assetSymbol */}
-                  <img
-                    src={`/icons/${trade.assetSymbol.toLowerCase()}.png`} // Correctly reference the image using assetSymbol
-                    alt={trade.assetSymbol}
-                    className="w-5 h-5"
-                  />
-                  <span>{trade.action} {trade.assetSymbol}</span>
-                </td>
-                <td>{trade.amount} {trade.assetSymbol}</td>
-                <td>${trade.price.toFixed(2)}</td>
-                <td
-                  className={`${
-                    trade.status === "Pending" ? "text-yellow-300" : "text-green-300"
-                  }`}
-                >
-                  {trade.status}
-                </td>
-                <td>{trade.date}</td>
+      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl p-4 shadow-lg">
+        {trades.length === 0 ? (
+          <p className="text-center text-white">No activities yet</p> 
+        ) : (
+          <table className="w-full">
+            <thead>
+              <tr className="text-left text-sm uppercase">
+                <th className="pb-3">Status</th>
+                <th className="pb-3">Action</th>
+                <th className="pb-3">Take Profit</th>
+                <th className="pb-3">Stop Loss</th>
+                <th className="pb-3">Quantity</th>
+                <th className="pb-3">Symbol</th>
+                <th className="pb-3">Created At</th> {/* New column for created_at */}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {trades.map((trade, index) => (
+                <tr key={index} className="border-t border-white/20 text-sm">
+                  <td
+                    className={`${
+                      trade.status === "pending" || trade.status === "Pending"
+                        ? "text-yellow-300"
+                        : "text-green-300"
+                    }`}
+                  >
+                    {trade.status}
+                  </td>
+                  <td>{trade.status === "completed" ? "Completed" : "Pending"}</td>
+                  <td>{trade.take_profit ? `$${trade.take_profit}` : "N/A"}</td>
+                  <td>{trade.stop_loss ? `$${trade.stop_loss}` : "N/A"}</td>
+                  <td>{trade.quantity}</td>
+                  <td>{trade.symbol || "N/A"}</td>
+                  <td>{trade.created_at || "N/A"}</td> {/* Display created_at */}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
 };
 
 ActivityMonitor.propTypes = {
-  trades: PropTypes.arrayOf(
-    PropTypes.shape({
-      assetSymbol: PropTypes.string.isRequired, // Currency pair like EURUSD
-      amount: PropTypes.number.isRequired, // Amount of base currency traded
-      price: PropTypes.number.isRequired, // Trade price
-      action: PropTypes.oneOf(["Buy", "Sell"]).isRequired, // Action: Buy or Sell
-      status: PropTypes.oneOf(["Pending", "Completed"]).isRequired,
-      date: PropTypes.string.isRequired, // Trade date
+  trades: arrayOf(
+    shape({
+      status: string.isRequired,
+      action: string.isRequired,
+      take_profit: string,
+      stop_loss: string,
+      quantity: PropTypes.number.isRequired,
+      symbol: string.isRequired,
+      created_at: string, // Added created_at to prop types
     })
   ).isRequired,
 };

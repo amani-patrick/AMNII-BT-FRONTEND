@@ -40,9 +40,10 @@ export default function Home() {
       <h1 className="text-2xl font-semibold">Dashboard &gt; Home</h1>
 
       <section className="mt-6 grid grid-cols-3 gap-4">
-        <AssetCard symbol="EURUSD" />
-        <AssetCard symbol="GBPUSD" />
-        <AssetCard symbol="AUDCAD" />
+          <AssetCard symbol="EURUSD" updateInterval={1000 * 60 * 60 * 3} />
+          <AssetCard symbol="GBPUSD" updateInterval={1000 * 60 * 60 * 3} />
+          <AssetCard symbol="USDJPY" updateInterval={1000 * 60 * 60 * 3} />
+
       </section>
 
       <section className="mt-6 flex flex-col space-y-6">

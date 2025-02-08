@@ -5,7 +5,7 @@ import Market from "./components/pages/Market";
 import Reports from "./components/pages/Reports";
 import Settings from "./components/pages/Settings";
 import Account from "./components/pages/Account";
-import Login from "./components/pages/Login";
+import Login from "./components/pages/login";
 import Register from "./components/pages/Register";
 import propTypes from "prop-types";
 
