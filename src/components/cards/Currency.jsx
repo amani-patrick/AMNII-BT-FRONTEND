@@ -1,12 +1,9 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; 
-
 
 const AssetCard = ({ symbol }) => {
   const [price, setPrice] = useState(null);
-  const navigate = useNavigate(); // Hook for navigation
 
   useEffect(() => {
     const fetchForexData = async () => {
@@ -16,10 +13,9 @@ const AssetCard = ({ symbol }) => {
       } catch (error) {
         console.error("Error fetching forex data:", error);
 
-        // Check if the error response exists and contains the unauthorized message
+        // Handle unauthorized access without navigating to login
         if (error.response && error.response.data.message === "Unauthorised! Access denied ") {
-          alert("Session expired. Redirecting to login...");
-          navigate("/login"); // Redirect to login page
+          console.warn("Session expired. Please log in again."); // Placeholder message
         }
       }
     };
@@ -28,7 +24,7 @@ const AssetCard = ({ symbol }) => {
     const interval = setInterval(fetchForexData, 30000); // Refresh data every 30 seconds
 
     return () => clearInterval(interval);
-  }, [symbol, navigate]);
+  }, [symbol]);
 
   return (
     <div className="bg-gray-800 text-white p-4 rounded-xl shadow-lg w-64 text-center">

@@ -3,14 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FiUser, FiLock } from "react-icons/fi";
 import axios from "axios";
-import { useAuth } from "../util/AuthProvider";  
 
 export default function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();  
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,21 +20,20 @@ export default function Login() {
       setError("Username and Password are required.");
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       const response = await axios.post("http://localhost:8000/api/auth/login/", formData, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-  
+
       if (response.status === 200) {
         const { access_token, refresh_token } = response.data;
         localStorage.setItem("access_token", access_token);
-        document.cookie = `refresh_token=${refresh_token}; path=/; secure; HttpOnly; SameSite=Strict`;
-        login(access_token);
+        document.cookie = `${refresh_token}; path=/; secure; HttpOnly; SameSite=Strict`;
         navigate("/");
       }
     } catch (err) {

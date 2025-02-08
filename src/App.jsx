@@ -1,18 +1,20 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "./components/util/AuthProvider.jsx";  // Import the custom hook
 import Layout from "./Layout";
 import Home from "./components/pages/Home";
 import Market from "./components/pages/Market";
 import Reports from "./components/pages/Reports";
 import Settings from "./components/pages/Settings";
 import Account from "./components/pages/Account";
-import Login from "./components/pages/login";
-import Register from "./components/pages/register";
+import Login from "./components/pages/Login";
+import Register from "./components/pages/Register";
 import propTypes from "prop-types";
 
+function isAuthenticated() {
+  return !!localStorage.getItem("access_token");
+}
+
 function PrivateRoute({ element }) {
-  const { isAuthenticated } = useAuth(); // Access authentication status
-  return isAuthenticated ? element : <Navigate to="/login" replace />;
+  return isAuthenticated() ? element : <Navigate to="/login" replace />;
 }
 
 function App() {
@@ -27,8 +29,6 @@ function App() {
           <Route path="accounts" element={<PrivateRoute element={<Account />} />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Route>
-
-        {/* Authentication Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>
