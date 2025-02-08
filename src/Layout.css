@@ -1,0 +1,10 @@
+/* Hide scrollbars globally while keeping content scrollable */
+* {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer/Edge */
+  }
+  
+  *::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
+  
