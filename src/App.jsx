@@ -6,7 +6,7 @@ import Reports from "./components/pages/Reports";
 import Settings from "./components/pages/Settings";
 import Account from "./components/pages/Account";
 import Login from "./components/pages/login";
-import Register from "./components/pages/Register";
+import Register from "./components/pages/register";
 import propTypes from "prop-types";
 
 function isAuthenticated() {

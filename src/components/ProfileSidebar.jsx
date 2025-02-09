@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function ProfileSidebar() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [totalBalance, setTotalBalance] = useState(0);
+  const [accounts, setAccounts] = useState([]); // State to store accounts with their statuses
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -16,17 +18,47 @@ export default function ProfileSidebar() {
           return;
         }
 
+        // Fetch user data
         const response = await axios.get("http://localhost:8000/api/user/me/", {
           headers: {
-            Authorization: `Bearer ${token}`, 
+            Authorization: `Bearer ${token}`,
           },
         });
 
         setUserData(response.data);
-        console.log ("User Data:", response.data);
+        console.log("User Data:", response.data);
+
+        // Fetch account balances and statuses
+        const accountsResponse = await axios.get("http://localhost:8000/api/accounts/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Fetch the status of each account
+        const accountsWithStatus = await Promise.all(
+          accountsResponse.data.map(async (account) => {
+            const statusResponse = await axios.post(
+              "http://localhost:8000/api/bot/status/",
+              { account_name: account.name },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            return { ...account, status: statusResponse.data.status }; // Add status to each account
+          })
+        );
+
+        setAccounts(accountsWithStatus); // Set accounts with statuses
+        const total = accountsResponse.data.reduce(
+          (sum, account) => sum + parseFloat(account.balance || 0),
+          0
+        );
+        setTotalBalance(total.toFixed(2));
       } catch (err) {
         if (err.response) {
-          // Server responded with an error
           setError(err.response.data.detail || "Failed to load user data.");
         } else if (err.request) {
           setError("Server failed to respond");
@@ -49,6 +81,9 @@ export default function ProfileSidebar() {
     return <div>{error}</div>;
   }
 
+  // Check if any account is running
+  const isAnyAccountRunning = accounts.some(account => account.status === "running");
+
   return (
     <div className="w-72 bg-white p-6 shadow-lg rounded-lg flex flex-col h-screen">
       {/* Profile Section */}
@@ -58,16 +93,16 @@ export default function ProfileSidebar() {
           className="w-20 h-20 rounded-full mt-4"
           alt="Profile"
         />
-        <h3 className="text-lg font-semibold mt-2">{userData.username}</h3> {/* Displaying the logged-in username */}
+        <h3 className="text-lg font-semibold mt-2">{userData.username}</h3>
       </div>
 
       {/* Asset Value */}
       <div className="mt-6 text-center">
         <p className="text-gray-600 font-medium">Balance</p>
-        <p className="text-lg font-bold text-black">${userData.balance || 0}</p>
+        <p className="text-lg font-bold text-black">${totalBalance || 0}</p>
       </div>
 
-      {/* Open Trades (Scrollable if Needed) */}
+      {/* Open Trades */}
       <div className="mt-6 flex-1 overflow-y-auto scrollbar-hidden">
         <h3 className="text-lg font-bold">Open Trades</h3>
         <ul className="mt-2 space-y-4">
@@ -81,7 +116,9 @@ export default function ProfileSidebar() {
                       trade.pnl > 0 ? "text-green-500" : "text-red-500"
                     }`}
                   >
-                    {trade.pnl > 0 ? `+${(trade.pnl * 10000).toFixed(2)} Pips` : `-${(Math.abs(trade.pnl) * 10000).toFixed(2)} Pips`}
+                    {trade.pnl > 0
+                      ? `+${(trade.pnl * 10000).toFixed(2)} Pips`
+                      : `-${(Math.abs(trade.pnl) * 10000).toFixed(2)} Pips`}
                   </span>
                 </div>
                 <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -113,12 +150,22 @@ export default function ProfileSidebar() {
         </ul>
       </div>
 
-      {/* Status Button - Stays at Bottom */}
+      {/* Status Button */}
       <div className="mt-auto">
-        <button className="w-full bg-blue-500 text-white px-4 py-3 rounded-lg flex items-center justify-center space-x-2 shadow-md">
-          <span className="w-3 h-3 bg-red-500 rounded-full"></span>
-          <span className="font-medium">Not Running</span>
-        </button>
+        <div>
+          <button
+            className={`w-full bg-blue-500 text-white px-4 py-3 rounded-lg flex items-center justify-center space-x-2 shadow-md`}
+          >
+            <span
+              className={`w-3 h-3 rounded-full ${
+                isAnyAccountRunning ? "bg-green-500" : "bg-red-500"
+              }`}
+            ></span>
+            <span className="font-medium">
+              {isAnyAccountRunning ? "Running" : "Not Running"}
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   );

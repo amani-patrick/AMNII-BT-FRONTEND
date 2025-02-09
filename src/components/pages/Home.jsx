@@ -1,35 +1,7 @@
-/* eslint-disable no-unused-vars */
 import { useState } from "react";
-import ActivityMonitor from "../activity/ActivityMonitor";
 import AssetCard from "../cards/Currency";
 
 export default function Home() {
-    const [trades, setTrades] = useState([
-        {
-          assetSymbol: "EURUSD",
-          amount: 1000,
-          price: 1.0980,
-          action: "Buy",
-          status: "Completed",
-          date: "2025-02-06 10:00",
-        },
-        {
-          assetSymbol: "GBPUSD",
-          amount: 500,
-          price: 1.2635,
-          action: "Sell",
-          status: "Pending",
-          date: "2025-02-06 10:05",
-        },
-        {
-          assetSymbol: "AUDCAD",
-          amount: 2000,
-          price: 0.8920,
-          action: "Buy",
-          status: "Completed",
-          date: "2025-02-06 10:10",
-        },
-      ]);
 
   const [selectedSymbol, setSelectedSymbol] = useState("EURUSD");
   const [selectedTimeframe, setSelectedTimeframe] = useState("15");
@@ -42,14 +14,14 @@ export default function Home() {
       <section className="mt-6 grid grid-cols-3 gap-4">
           <AssetCard symbol="EURUSD" updateInterval={1000 * 60 * 60 * 3} />
           <AssetCard symbol="GBPUSD" updateInterval={1000 * 60 * 60 * 3} />
-          <AssetCard symbol="USDJPY" updateInterval={1000 * 60 * 60 * 3} />
+          <AssetCard symbol="AUDCAD" updateInterval={1000 * 60 * 60 * 3} />
 
       </section>
 
       <section className="mt-6 flex flex-col space-y-6">
         <div className="bg-white p-4 shadow-lg rounded-lg">
           <h2 className="text-lg font-bold mb-2">Activity</h2>
-          <ActivityMonitor trades={trades} />
+
         </div>
 
         <div className="bg-white p-4 shadow-lg rounded-lg w-full overflow-y-auto">

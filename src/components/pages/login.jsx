@@ -3,21 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FiUser, FiLock } from "react-icons/fi";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify"; // Import ToastContainer and toast
+import "react-toastify/dist/ReactToastify.css"; // Import the Toastify CSS
 
 export default function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ username: "", password: "" });
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError("");
   };
 
   const handleLogin = async () => {
     if (!formData.username || !formData.password) {
-      setError("Username and Password are required.");
+      toast.error("Username and Password are required.");
       return;
     }
 
@@ -35,6 +35,7 @@ export default function Login() {
         localStorage.setItem("access_token", access_token);
         document.cookie = `${refresh_token}; path=/; secure; HttpOnly; SameSite=Strict`;
         navigate("/");
+        toast.success("Login successful!");
       }
     } catch (err) {
       if (err.response) {
@@ -46,11 +47,11 @@ export default function Login() {
           }
         }
 
-        setError(errorMessages.join(" | "));
+        toast.error(errorMessages.join(" | "));
       } else if (err.request) {
-        setError("Network error. Try again later.");
+        toast.error("Network error. Try again later.");
       } else {
-        setError("An unexpected error occurred.");
+        toast.error("An unexpected error occurred.");
       }
     } finally {
       setLoading(false);
@@ -72,8 +73,6 @@ export default function Login() {
         <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
           Welcome Back 👋
         </h2>
-
-        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
 
         <div className="relative mb-4">
           <FiUser className="absolute left-3 top-3 text-gray-400" />
@@ -119,6 +118,9 @@ export default function Login() {
           </span>
         </p>
       </motion.div>
+
+      {/* Toast Container to show toast notifications */}
+      <ToastContainer />
     </div>
   );
 }

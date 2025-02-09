@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FiUser, FiLock, FiMail } from "react-icons/fi";
 import { FaUserCircle } from "react-icons/fa";
-import axios from "axios"; // Import axios
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify"; // Import ToastContainer and toast
+import "react-toastify/dist/ReactToastify.css"; // Import the Toastify CSS
 
 export default function Register() {
   const navigate = useNavigate();
@@ -14,25 +16,21 @@ export default function Register() {
     first_name: "",
     last_name: "",
   });
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError("");
-    setSuccess("");
   };
 
   const handleRegister = async () => {
     // Validate form fields
     if (!formData.username || !formData.password || !formData.email || !formData.first_name || !formData.last_name) {
-      setError("All fields are required.");
+      toast.error("All fields are required.");
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       // Send data to backend
       const response = await axios.post("http://127.0.0.1:8000/api/auth/register/", {
@@ -46,9 +44,9 @@ export default function Register() {
           "Content-Type": "application/json",
         },
       });
-  
+
       if (response.status === 201) {
-        setSuccess("Registration successful! Redirecting to login...");
+        toast.success("Registration successful! Redirecting to login...");
         setTimeout(() => navigate("/login"), 2000);
       }
     } catch (err) {
@@ -56,44 +54,39 @@ export default function Register() {
         // Server responded with an error
         const backendErrors = err.response.data;
         let errorMessages = [];
-  
+
         // Loop through the errors and create a list of messages
         for (const field in backendErrors) {
           if (Object.prototype.hasOwnProperty.call(backendErrors, field)) {
             errorMessages.push(...backendErrors[field]);
           }
         }
-  
-        // Join all error messages into a single string and set error state
-        setError(errorMessages.join(" | "));
+
+        // Join all error messages into a single string and show error toast
+        toast.error(errorMessages.join(" | "));
       } else if (err.request) {
         // Request was made but no response received
-        setError("Network error. Try again later.");
+        toast.error("Network error. Try again later.");
       } else {
         // Something else happened in setting up the request
-        setError("An unexpected error occurred.");
+        toast.error("An unexpected error occurred.");
       }
     } finally {
       setLoading(false);
     }
   };
-  
-  
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gray-100">
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }} 
-        animate={{ opacity: 1, y: 0 }} 
-        exit={{ opacity: 0, y: -20 }} 
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
         className="w-96 bg-white p-6 rounded-xl shadow-lg"
       >
         <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
           Create an Account 🚀
         </h2>
-
-        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
-        {success && <p className="text-green-500 text-sm mb-4 text-center">{success}</p>}
 
         <div className="relative mb-4">
           <FaUserCircle className="absolute left-3 top-3 text-gray-400" />
@@ -167,7 +160,7 @@ export default function Register() {
 
         <p className="text-sm text-center mt-4">
           Already have an account?{" "}
-          <span 
+          <span
             onClick={() => navigate("/login")}
             className="text-blue-600 cursor-pointer hover:underline"
           >
@@ -175,6 +168,9 @@ export default function Register() {
           </span>
         </p>
       </motion.div>
+
+      {/* Toast Container to show toast notifications */}
+      <ToastContainer />
     </div>
   );
 }
