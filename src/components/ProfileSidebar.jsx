@@ -19,7 +19,7 @@ export default function ProfileSidebar() {
         }
 
         // Fetch user data
-        const response = await axios.get("http://localhost:8000/api/user/me/", {
+        const response = await axios.get("https://amnii-bt.onrender.com/api/user/me/", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -29,7 +29,7 @@ export default function ProfileSidebar() {
         console.log("User Data:", response.data);
 
         // Fetch account balances and statuses
-        const accountsResponse = await axios.get("http://localhost:8000/api/accounts/", {
+        const accountsResponse = await axios.get("https://amnii-bt.onrender.com/api/accounts/", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -39,7 +39,7 @@ export default function ProfileSidebar() {
         const accountsWithStatus = await Promise.all(
           accountsResponse.data.map(async (account) => {
             const statusResponse = await axios.post(
-              "http://localhost:8000/api/bot/status/",
+              "https://amnii-bt.onrender.com/api/bot/status/",
               { account_name: account.name },
               {
                 headers: {

@@ -9,7 +9,7 @@ const ActivityMonitor = () => {
     const fetchTrades = async () => {
       try {
         const token = localStorage.getItem("access_token");
-        const response = await axios.get("http://localhost:8000/api/orders/", {
+        const response = await axios.get("https://amnii-bt.onrender.com/api/orders/", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setTrades(response.data);

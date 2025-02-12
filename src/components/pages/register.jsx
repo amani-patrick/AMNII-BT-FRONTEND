@@ -33,7 +33,7 @@ export default function Register() {
 
     try {
       // Send data to backend
-      const response = await axios.post("http://127.0.0.1:8000/api/auth/register/", {
+      const response = await axios.post("https://amnii-bt.onrender.com/api/auth/register/", {
         username: formData.username,
         password: formData.password,
         email: formData.email,

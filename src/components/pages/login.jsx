@@ -24,7 +24,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:8000/api/auth/login/", formData, {
+      const response = await axios.post("https://amnii-bt.onrender.com/api/auth/login/", formData, {
         headers: {
           "Content-Type": "application/json",
         },

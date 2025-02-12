@@ -13,7 +13,7 @@ const AssetCard = ({ symbol, updateInterval }) => {
     const fetchForexData = async () => {
       try {
         const token = localStorage.getItem("access_token");
-        const response = await axios.get(`http://localhost:8000/api/markets/forex/${symbol}/`, {
+        const response = await axios.get(`https://amnii-bt.onrender.com/api/markets/forex/${symbol}/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

@@ -17,8 +17,8 @@ export default function Account() {
   const [errorMessage, setErrorMessage] = useState(null);
 
   // Set the base URL for API requests
-  const apiUrl = "http://localhost:8000/api/accounts/";
-  const botApiUrl = "http://localhost:8000/api/bot/";
+  const apiUrl = "https://amnii-bt.onrender.com/api/accounts/";
+  const botApiUrl = "https://amnii-bt.onrender.com/api/bot/";
 
   // Retrieve access token from localStorage
   const accessToken = localStorage.getItem("access_token");

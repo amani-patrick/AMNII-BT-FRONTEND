@@ -24,7 +24,7 @@ export default function Markets() {
           return;
         }
 
-        const response = await fetch(`http://localhost:8000/api/analytics/${selectedSymbol}/`, {
+        const response = await fetch(`https://amnii-bt.onrender.com/api/analytics/${selectedSymbol}/`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${accessToken}`,
